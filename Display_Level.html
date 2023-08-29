@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Garbage Level Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="garbageChart" width="400" height="200"></canvas>
+    <script>
+        var ctx = document.getElementById('garbageChart').getContext('2d');
+        var garbageChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [], // Labels for time intervals
+                datasets: [{
+                    label: 'Garbage Level',
+                    data: [], // Data for garbage levels
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function fetchDataAndUpdateChart() {
+            fetch('http://yourserver.com/get_garbage_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    // Assuming the data is an array of objects with timestamp and garbage_level
+                    var timestamps = data.map(entry => entry.timestamp);
+                    var garbageLevels = data.map(entry => entry.garbage_level);
+
+                    garbageChart.data.labels = timestamps;
+                    garbageChart.data.datasets[0].data = garbageLevels;
+                    garbageChart.update();
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        setInterval(fetchDataAndUpdateChart, 5000); // Update every 5 seconds
+    </script>
+</body>
+</html>
